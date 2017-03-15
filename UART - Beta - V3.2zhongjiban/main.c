@@ -17,7 +17,8 @@ typedef unsigned int  uint;
 #define SIZE       51
 
 #define LED1 P1_0       // P1.0口控制LED1
-#define KEY1 P0_1       // P0.1口控制S1
+//#define KEY1 P0_1       // P0.1口控制S1
+#define KEY1 P0_0       // P0.0口控制S1
 
 char RxBuf;
 char UartState;
@@ -30,7 +31,7 @@ unsigned char flag1=0;//存放每个周期进入中断次数
 unsigned char flag2=0;//存放每个周期进入中断次数
 uchar irpro_ok,irok;
 unsigned char IRcord[15];
-unsigned char irdata[120];
+unsigned char irdata[121];
 /*------------------------------------------------
                   函数声明
 ------------------------------------------------*/
@@ -71,7 +72,9 @@ void InitLed(void)
 ****************************************************************************/
 void InitKey()
 {
-    P0IEN |= 0x2;    // P0.1 设置为中断方式 1：中断使能
+//    P0IEN |= 0x2;    // P0.1 设置为中断方式 1：中断使能
+  
+    P0IEN |= 0x01;    // P0.1 设置为中断方式 1：中断使能
     PICTL |= 0x2;    //下降沿触发   
     IEN1 |= 0x20;    //允许P0口中断; 
     P0IFG = 0x00;    //初始化中断标志位
