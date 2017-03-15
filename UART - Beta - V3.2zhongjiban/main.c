@@ -32,6 +32,8 @@ unsigned char flag2=0;//存放每个周期进入中断次数
 uchar irpro_ok,irok;
 unsigned char IRcord[15];
 unsigned char irdata[121];
+unsigned char irAsc[32];
+static unsigned char Tab[17]="0123456789ABCDEF";
 /*------------------------------------------------
                   函数声明
 ------------------------------------------------*/
@@ -253,7 +255,16 @@ __interrupt void T3_ISR(void)
 
 void Ir_work(void)
 {
-    irpro_ok=0;//处理完成标志
+  unsigned char i;
+  for(i=0;i<15;i++)  
+  {
+     irAsc[2*i]   =Tab[IRcord[i]/16];
+     irAsc[2*i+1] =Tab[IRcord[i]%16];
+  }
+    irAsc[30]='\r';
+    irAsc[31]='\n';
+    UartSendString(irAsc,32);     
+  irpro_ok=0;//处理完成标志
 }
 /*------------------------------------------------
                 红外码值处理
@@ -278,9 +289,12 @@ void Ircordpro(void)//红外码值处理函数
         }
         IRcord[i]=value;
         value=0; 
-        UartSendHex(IRcord[i]);
+//        UartSendHex(IRcord[i]);
+//        UartSendHex(0x13);
+        
     }
 //    UartSendString(IRcord,15); 
+//    UartSendHex(0x13);
     irpro_ok=1;//处理完毕标志位置1
 }
 
@@ -300,12 +314,15 @@ void main(void)
         if(irok)                        //如果接收好了进行红外处理
         {   
             Ircordpro();
-            irok=0;
+           irok=0;
+
         }
 
         if(irpro_ok)                   //如果处理好后进行工作处理，如按对应的按键后显示对应的数字等
         {
             Ir_work();
+
+
         }
     }
         
